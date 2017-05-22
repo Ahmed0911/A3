@@ -32,6 +32,7 @@
 #include "Drivers/IMU.h"
 #include "Drivers/EEPROMDrv.h"
 #include "Drivers/CANDrv.h"
+#include "Drivers/PulsedLightI2C.h"
 
 #include "LLConverter.h"
 #include "CRC32.h"
@@ -60,6 +61,7 @@ EEPROMDrv eeprom;
 CRC32 crc;
 Comm433MHz comm433MHz;
 CANDrv canDrv;
+PulsedLightI2C pulseI2C;
 
 // System Objects
 LLConverter llConv;
@@ -127,6 +129,7 @@ void main(void)
     //hopeRF.Init();
     imu.Init();
     canDrv.Init();
+    pulseI2C.Init();
 
     // Systick
     SysTickPeriodSet(g_ui32SysClock/SysTickFrequency);
