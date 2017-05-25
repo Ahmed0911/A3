@@ -67,7 +67,7 @@ PulsedLightI2C pulseI2C;
 LLConverter llConv;
 
 // Systick
-#define SysTickFrequency 50
+#define SysTickFrequency 20
 volatile bool SysTickIntHit = false;
 
 // Buffers

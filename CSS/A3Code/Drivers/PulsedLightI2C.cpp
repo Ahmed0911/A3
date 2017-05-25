@@ -91,10 +91,13 @@ int16_t PulsedLightI2C::SoftUpdate()
         SoftI2CSend(LidarWriteAddr,0x00,0x04);
 
         //wait for 20 ms
-        //SysCtlDelay(g_ui32SysClock / (20));
+        SysCtlDelay(g_ui32SysClock / 50);
 
         // Read Data
-        //Dist =  I2CReceive(LidarReadAddr,LidarWriteAddr,Lidar2ByteRead);
+        Dist =  SoftI2CReceive(LidarReadAddr,LidarWriteAddr,Lidar2ByteRead);
+
+        //wait for 20 ms
+        SysCtlDelay(g_ui32SysClock / 50);
 
         return Dist;
 }
@@ -150,6 +153,62 @@ uint16_t PulsedLightI2C::I2CReceive(uint16_t ReadAddr,uint16_t WriteAddr, uint8_
     return Data;
 }
 
+uint16_t PulsedLightI2C::SoftI2CReceive(uint16_t ReadAddr,uint16_t WriteAddr, uint8_t reg)
+{
+    uint16_t Data = 0;
+
+    // Set Read request
+    // start
+    Start();
+
+    // send address
+    Send(WriteAddr);
+
+    // ACK pulse
+    bool ack = GetAck();
+
+    // send address
+    Send(reg);
+
+    // ACK pulse
+    ack = GetAck();
+
+    // stop pulse
+    Stop();
+
+    //SysCtlDelay(g_ui32SysClock / 50);
+
+    // Get Data
+    // start
+    Start();
+
+    // send address
+    Send(ReadAddr);
+
+    // ACK pulse
+    GetAck();
+
+    // get first byte
+    Data = Receive();
+
+    // Shift Data
+    Data = (Data << 8);
+
+    // send ack
+    SetAck();
+
+    // get second byte
+    Data += Receive();
+
+    // send ack
+    SetNAck();
+
+    // Stop
+    Stop();
+
+    return Data;
+}
+
 //Write to I2C1
 uint16_t PulsedLightI2C::I2CSend(uint16_t WriteAddr, uint8_t reg, uint8_t value)
 {
@@ -189,14 +248,27 @@ uint16_t PulsedLightI2C::SoftI2CSend(uint16_t WriteAddr, uint8_t reg, uint8_t va
     Send(WriteAddr);
 
     // ACK pulse
+    bool ack = GetAck();
+
+    // send reg
+    Send(reg);
+
+    // ACK pulse
     GetAck();
 
+    // send Value
+    Send(value);
+
+    // ACK pulse
+    GetAck();
+
+    // Stop
     Stop();
 }
 
 void PulsedLightI2C::Wait()
 {
-    SysCtlDelay(g_ui32SysClock / 300000);
+    SysCtlDelay(g_ui32SysClock / 100000);
 }
 
 void PulsedLightI2C::Idle()
@@ -256,10 +328,55 @@ bool PulsedLightI2C::GetAck()
     Wait();
     // check ACK
     int val = GPIOPinRead(GPIO_PORTG_BASE, GPIO_PIN_1);
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
     GPIOPinTypeGPIOOutput(GPIO_PORTG_BASE, GPIO_PIN_1); // set as output
     GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 ); // SDA low
-    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
     Wait();
 
     return (val == 0);
+}
+
+uint8_t PulsedLightI2C::Receive()
+{
+   uint8_t dataX = 0;
+   GPIOPinTypeGPIOInput(GPIO_PORTG_BASE, GPIO_PIN_1);
+   for(int i = 7; i>=0; i--)
+   {
+       Wait();
+       GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 ); // SCL high
+       int val = GPIOPinRead(GPIO_PORTG_BASE, GPIO_PIN_1);
+       Wait();
+       GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
+       Wait();
+       if( val ) dataX+=1;
+       dataX = (dataX << 1);
+   }
+   GPIOPinTypeGPIOOutput(GPIO_PORTG_BASE, GPIO_PIN_1); // set as output
+   GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 ); // SDA low
+
+   return dataX;
+}
+
+
+void PulsedLightI2C::SetAck()
+{
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 ); // SDA low
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 ); // SCL high
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
+    Wait();
+}
+
+void PulsedLightI2C::SetNAck()
+{
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, GPIO_PIN_1 ); // SDA high
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 ); // SCL high
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 ); // SDA low
+    Wait();
 }

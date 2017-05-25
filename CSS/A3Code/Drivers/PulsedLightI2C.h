@@ -22,6 +22,7 @@ private:
     uint16_t I2CReceive(uint16_t, uint16_t, uint8_t);
     uint16_t I2CSend(uint16_t, uint8_t , uint8_t);
 
+    uint16_t SoftI2CReceive(uint16_t ReadAddr,uint16_t WriteAddr, uint8_t reg);
     uint16_t SoftI2CSend(uint16_t, uint8_t , uint8_t);
 
     // I2C Stuff
@@ -32,7 +33,10 @@ private:
 
     void PulseCLK();
     void Send(uint8_t data);
+    uint8_t Receive();
     bool GetAck();
+    void SetAck();
+    void SetNAck();
 };
 
 #endif /* DRIVERS_PULSEDLIGHTI2C_H_ */
