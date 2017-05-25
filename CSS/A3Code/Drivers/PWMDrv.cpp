@@ -37,42 +37,42 @@ void PWMDrv::Init()
 	GPIOPinConfigure(GPIO_PF1_M0PWM1);
 	GPIOPinConfigure(GPIO_PF2_M0PWM2);
 	GPIOPinConfigure(GPIO_PF3_M0PWM3);
-	GPIOPinConfigure(GPIO_PG0_M0PWM4);
-	GPIOPinConfigure(GPIO_PG1_M0PWM5);
+	//GPIOPinConfigure(GPIO_PG0_M0PWM4);
+	//GPIOPinConfigure(GPIO_PG1_M0PWM5);
 
 	GPIOPinTypePWM(GPIO_PORTF_BASE, GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 |GPIO_PIN_3 );
-	GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+	//GPIOPinTypePWM(GPIO_PORTG_BASE, GPIO_PIN_0 | GPIO_PIN_1);
 
 	PWMGenConfigure(PWM0_BASE, PWM_GEN_0, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC | PWM_GEN_MODE_DBG_RUN); // PWM3, PWM4
 	PWMGenConfigure(PWM0_BASE, PWM_GEN_1, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC | PWM_GEN_MODE_DBG_RUN); // PWM2, PWM1
-	PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC | PWM_GEN_MODE_DBG_RUN); // PWM6, PWM5
+	//PWMGenConfigure(PWM0_BASE, PWM_GEN_2, PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC | PWM_GEN_MODE_DBG_RUN); // PWM6, PWM5
 
 	// set timers period
 	unsigned long ulPeriod = (g_ui32SysClock / 64) / PWMFREQ;
 	PWMGenPeriodSet(PWM0_BASE, PWM_GEN_0, ulPeriod);
 	PWMGenPeriodSet(PWM0_BASE, PWM_GEN_1, ulPeriod);
-	PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, ulPeriod);
+	//PWMGenPeriodSet(PWM0_BASE, PWM_GEN_2, ulPeriod);
 
 	// set default PWM duty (0%)
 	PWMPulseWidthSet(PWM0_BASE, PWM_OUT_0, 0);
 	PWMPulseWidthSet(PWM0_BASE, PWM_OUT_1, 0);
 	PWMPulseWidthSet(PWM0_BASE, PWM_OUT_2, 0);
 	PWMPulseWidthSet(PWM0_BASE, PWM_OUT_3, 0);
-	PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, 0);
-	PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 0);
+	//PWMPulseWidthSet(PWM0_BASE, PWM_OUT_4, 0);
+	//PWMPulseWidthSet(PWM0_BASE, PWM_OUT_5, 0);
 
 	// enable PWM outputs to PINs
 	PWMOutputState(PWM0_BASE, PWM_OUT_0_BIT, true);
 	PWMOutputState(PWM0_BASE, PWM_OUT_1_BIT, true);
 	PWMOutputState(PWM0_BASE, PWM_OUT_2_BIT, true);
 	PWMOutputState(PWM0_BASE, PWM_OUT_3_BIT, true);
-	PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT, true);
-	PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
+	//PWMOutputState(PWM0_BASE, PWM_OUT_4_BIT, true);
+	//PWMOutputState(PWM0_BASE, PWM_OUT_5_BIT, true);
 
 	// enable PWM modules
 	PWMGenEnable(PWM0_BASE, PWM_GEN_0);
 	PWMGenEnable(PWM0_BASE, PWM_GEN_1);
-	PWMGenEnable(PWM0_BASE, PWM_GEN_2);
+	//PWMGenEnable(PWM0_BASE, PWM_GEN_2);
 }
 
 // NOTE: Index as position on PCB, not real PWM output numbers!

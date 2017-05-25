@@ -53,6 +53,18 @@ void PulsedLightI2C::Init()
         HWREG(I2C1_BASE + I2C_O_FIFOCTL) = 80008000;
 }
 
+void PulsedLightI2C::SoftInit()
+{
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOG);
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 );
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, GPIO_PIN_1 );
+    GPIOPadConfigSet(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_OD);
+    GPIOPadConfigSet(GPIO_PORTG_BASE, GPIO_PIN_1, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_OD);
+    GPIOPinTypeGPIOOutput(GPIO_PORTG_BASE, GPIO_PIN_0 | GPIO_PIN_1);
+
+    Idle();
+}
+
 int16_t PulsedLightI2C::Update()
 {
     // Integer to store data
@@ -62,12 +74,29 @@ int16_t PulsedLightI2C::Update()
     I2CSend(LidarWriteAddr,0x00,0x04);
 
     //wait for 20 ms
-    SysCtlDelay(g_ui32SysClock / (160));
+    //SysCtlDelay(g_ui32SysClock / (20));
 
     // Read Data
-    Dist =  I2CReceive(LidarReadAddr,LidarWriteAddr,Lidar2ByteRead);
+    //Dist =  I2CReceive(LidarReadAddr,LidarWriteAddr,Lidar2ByteRead);
 
     return Dist;
+}
+
+int16_t PulsedLightI2C::SoftUpdate()
+{
+        // Integer to store data
+        uint16_t Dist = 0;
+
+        // Prepare Lidar for reading
+        SoftI2CSend(LidarWriteAddr,0x00,0x04);
+
+        //wait for 20 ms
+        //SysCtlDelay(g_ui32SysClock / (20));
+
+        // Read Data
+        //Dist =  I2CReceive(LidarReadAddr,LidarWriteAddr,Lidar2ByteRead);
+
+        return Dist;
 }
 
 // Read function for I2C1
@@ -104,13 +133,15 @@ uint16_t PulsedLightI2C::I2CReceive(uint16_t ReadAddr,uint16_t WriteAddr, uint8_
     Data = Data << 8;
 
     // Read last 8 Byte
-     I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
-
-    //Wait until slave device finished it's transaction
-     while(I2CMasterBusy(I2C1_BASE));
+    I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_CONT);
+    while(I2CMasterBusy(I2C1_BASE));
 
     // Shift in LSB
-     Data |= I2CMasterDataGet(I2C1_BASE);
+    Data |= I2CMasterDataGet(I2C1_BASE);
+
+    I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_RECEIVE_FINISH);
+    //Wait until slave device finished it's transaction
+    while(I2CMasterBusy(I2C1_BASE));
 
     // If error occur store messg
     char test = I2CMasterErr(I2C1_BASE);
@@ -143,9 +174,92 @@ uint16_t PulsedLightI2C::I2CSend(uint16_t WriteAddr, uint8_t reg, uint8_t value)
     //Sends control - and register address -byte to slave device
     I2CMasterControl(I2C1_BASE, I2C_MASTER_CMD_BURST_SEND_FINISH);
 
-    // //Wait until slave device finished it's transaction
     while(I2CMasterBusy(I2C1_BASE));
 
-    // If error occur return message.
+        // If error occur return message.
     return I2CMasterErr(I2C1_BASE);
+}
+
+uint16_t PulsedLightI2C::SoftI2CSend(uint16_t WriteAddr, uint8_t reg, uint8_t value)
+{
+    // start
+    Start();
+
+    // send address
+    Send(WriteAddr);
+
+    // ACK pulse
+    GetAck();
+
+    Stop();
+}
+
+void PulsedLightI2C::Wait()
+{
+    SysCtlDelay(g_ui32SysClock / 300000);
+}
+
+void PulsedLightI2C::Idle()
+{
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 );
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, GPIO_PIN_1 );
+    Wait();
+}
+
+void PulsedLightI2C::Start()
+{
+    // set idle
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 );
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, GPIO_PIN_1 );
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 ); // SDA to low
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
+    Wait();
+}
+
+void PulsedLightI2C::Stop()
+{
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 ); // SCL high
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 );  // SDA low
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, GPIO_PIN_1 ); // SDA to high
+    Wait();
+}
+
+void PulsedLightI2C::PulseCLK()
+{
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 ); // SCL high
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
+    Wait();
+}
+
+void PulsedLightI2C::Send(uint8_t data)
+{
+    for(int i = 7; i>=0; i--)
+    {
+        uint8_t bit = data & (1<<i);
+        if( bit )GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, GPIO_PIN_1 );
+        else GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 );
+        PulseCLK();
+    }
+}
+
+bool PulsedLightI2C::GetAck()
+{
+    // set as input
+    GPIOPinTypeGPIOInput(GPIO_PORTG_BASE, GPIO_PIN_1);
+    Wait();
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, GPIO_PIN_0 ); // SCL high
+    Wait();
+    // check ACK
+    int val = GPIOPinRead(GPIO_PORTG_BASE, GPIO_PIN_1);
+    GPIOPinTypeGPIOOutput(GPIO_PORTG_BASE, GPIO_PIN_1); // set as output
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_1, 0 ); // SDA low
+    GPIOPinWrite(GPIO_PORTG_BASE, GPIO_PIN_0, 0 ); // SCL low
+    Wait();
+
+    return (val == 0);
 }

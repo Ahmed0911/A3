@@ -67,7 +67,7 @@ PulsedLightI2C pulseI2C;
 LLConverter llConv;
 
 // Systick
-#define SysTickFrequency 400
+#define SysTickFrequency 50
 volatile bool SysTickIntHit = false;
 
 // Buffers
@@ -87,6 +87,7 @@ float Acc[3];
 float Gyro[3];
 float Mag[3];
 float Pressure0 = 101300;
+unsigned short PulsedLidarRange = 0;
 
 // OFFSETS
 float GyroOffX = 0;
@@ -129,7 +130,7 @@ void main(void)
     //hopeRF.Init();
     imu.Init();
     canDrv.Init();
-    pulseI2C.Init();
+    pulseI2C.SoftInit();
 
     // Systick
     SysTickPeriodSet(g_ui32SysClock/SysTickFrequency);
@@ -159,6 +160,9 @@ void main(void)
 
         // Baro
         baroDrv.Update(); // [??? us]
+
+        // PulseLight
+        PulsedLidarRange = pulseI2C.SoftUpdate();
 
         // IMU1
         mpu9250Drv.Update();
