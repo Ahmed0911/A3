@@ -13,16 +13,11 @@
 class PulsedLightI2C
 {
 public:
-    void Init();
     void SoftInit();
-    int16_t Update();
     int16_t SoftUpdate();
 
 private:
-    uint16_t I2CReceive(uint16_t, uint16_t, uint8_t);
-    uint16_t I2CSend(uint16_t, uint8_t , uint8_t);
-
-    uint16_t SoftI2CReceive(uint16_t ReadAddr,uint16_t WriteAddr, uint8_t reg);
+    uint8_t SoftI2CReceive8(uint16_t ReadAddr,uint16_t WriteAddr, uint8_t reg);
     uint16_t SoftI2CSend(uint16_t, uint8_t , uint8_t);
 
     // I2C Stuff
