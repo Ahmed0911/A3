@@ -54,7 +54,7 @@ BaroDrv baroDrv;
 MPU9250Drv mpu9250Drv;
 LSM90DDrv lsm90Drv;
 UBloxGPS gps;
-//EtherDriver etherDrv;
+EtherDriver etherDrv;
 //HopeRF    hopeRF;
 IMU imu;
 EEPROMDrv eeprom;
@@ -67,7 +67,7 @@ PulsedLightI2C pulseI2C;
 LLConverter llConv;
 
 // Systick
-#define SysTickFrequency 20
+#define SysTickFrequency 50
 volatile bool SysTickIntHit = false;
 
 // Buffers
@@ -87,7 +87,10 @@ float Acc[3];
 float Gyro[3];
 float Mag[3];
 float Pressure0 = 101300;
+
 unsigned short PulsedLidarRange = 0;
+int PulsedLidarErrors = 0;
+unsigned short SharpDistanceSensor = 0;
 
 // OFFSETS
 float GyroOffX = 0;
@@ -126,7 +129,7 @@ void main(void)
     mpu9250Drv.Init();
     //lsm90Drv.Init();
     //InitGPS(); // init GPS
-    //etherDrv.Init();
+    etherDrv.Init();
     //hopeRF.Init();
     imu.Init();
     canDrv.Init();
@@ -157,12 +160,15 @@ void main(void)
 
         // ADC + Current Calc
         adcDrv.Update();
+        SharpDistanceSensor = adcDrv.GetValue(ADCBATTCURRENT);
 
         // Baro
         baroDrv.Update(); // [??? us]
 
         // PulseLight
-        PulsedLidarRange = pulseI2C.SoftUpdate();
+        unsigned short newRange = pulseI2C.SoftUpdate();
+        if( newRange != 0 ) PulsedLidarRange = newRange;
+        else PulsedLidarErrors++;
 
         // IMU1
         mpu9250Drv.Update();
@@ -186,7 +192,7 @@ void main(void)
         if(MainLoopCounter == (SysTickFrequency * 2)) Pressure0 = baroDrv.PressurePa;
 
         // process ethernet (RX)
-        //etherDrv.Process(1000/SysTickFrequency); // 2.5ms tick
+        etherDrv.Process(1000/SysTickFrequency); // 2.5ms tick
 
         // Read Lora Data
         int dataReceived = serialU5.Read(CommBuffer, COMMBUFFERSIZE);

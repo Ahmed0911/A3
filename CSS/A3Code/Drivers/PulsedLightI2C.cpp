@@ -42,6 +42,14 @@ void PulsedLightI2C::SoftInit()
     //wait for 20 ms
     SysCtlDelay(g_ui32SysClock / 50);
 
+    // new read request
+    // Prepare Lidar for reading
+    SoftI2CSend(LidarWriteAddr,0x00,0x04);
+
+    //wait for 20 ms
+    SysCtlDelay(g_ui32SysClock / 50);
+
+
     Idle();
 }
 
@@ -49,12 +57,6 @@ int16_t PulsedLightI2C::SoftUpdate()
 {
     // Integer to store data
     uint16_t Dist = 0;
-
-    // Prepare Lidar for reading
-    SoftI2CSend(LidarWriteAddr,0x00,0x04);
-
-    //wait for 20 ms
-    SysCtlDelay(g_ui32SysClock / (50*3));
 
     // Read Data
     Dist =  SoftI2CReceive8(LidarReadAddr,LidarWriteAddr,0x0F);
@@ -65,6 +67,10 @@ int16_t PulsedLightI2C::SoftUpdate()
     // get low byte
     Dist+=SoftI2CReceive8(LidarReadAddr,LidarWriteAddr,0x10);
 
+
+    // new read request
+    // Prepare Lidar for reading
+    SoftI2CSend(LidarWriteAddr,0x00,0x04);
 
     return Dist;
 }
@@ -110,7 +116,10 @@ uint8_t PulsedLightI2C::SoftI2CReceive8(uint16_t ReadAddr,uint16_t WriteAddr, ui
     // Stop
     Stop();
 
-    SysCtlDelay(g_ui32SysClock / 50);
+    for(int i=0; i!=5; i++)
+    {
+        Wait();
+    }
 
     return Data;
 }
