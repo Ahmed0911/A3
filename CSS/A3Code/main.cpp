@@ -37,6 +37,7 @@
 #include "LLConverter.h"
 #include "CRC32.h"
 #include "Comm433MHz.h"
+#include "CommData.h"
 
 uint32_t g_ui32SysClock;
 
@@ -77,7 +78,8 @@ BYTE CommBuffer[COMMBUFFERSIZE];
 BYTE HopeRFbuffer[255];
 
 // Global Functions
-
+void SendPeriodicDataEth(void);
+void ProcessCommand(int cmd, unsigned char* data, int dataSize);
 
 ////////////////////
 // Global Data
@@ -210,7 +212,7 @@ void main(void)
         //lsm90Drv.Update();
 
         // process ethernet (RX)
-        etherDrv.Process(1000/SysTickFrequency); // 2.5ms tick
+        etherDrv.Process(1000/SysTickFrequency); // Tick
 
         // Read Lora Data
         //int dataReceived = serialU5.Read(CommBuffer, COMMBUFFERSIZE);
@@ -232,7 +234,8 @@ void main(void)
         // DBG LED
         //dbgLed.Set(ctrl.rtY.GreenLED);
 
-
+        // send periodic data (ethernet)
+        SendPeriodicDataEth();
 
 
         /////////////////////////////////
@@ -246,6 +249,53 @@ void main(void)
         SysTickIntHit = false;
         // Get total loop time
         PerfLoopTimeMS = timerLoop.GetUS()/1000.0f;
+    }
+}
+
+void SendPeriodicDataEth(void)
+{
+    // Fill data
+    SCommEthData data;
+    memset(&data,0, sizeof(data) );
+    data.LoopCounter = MainLoopCounter;
+    data.ActualMode = 0;
+    data.Roll = imu.Roll;
+    data.Pitch = imu.Pitch;
+    data.Yaw = imu.Yaw;
+    data.dRoll = Gyro[0];
+    data.dPitch = Gyro[1];
+    data.dYaw = Gyro[2];
+    data.AccX = Acc[0];
+    data.AccY = Acc[1];
+    data.AccZ = Acc[2];
+    data.MagX = Mag[0];
+    data.MagY = Mag[1];
+    data.MagZ = Mag[2];
+
+    data.Pressure = PressurePa;
+    data.Temperature = TemperatureC;
+
+    // RF Data + Perf
+    data.EthReceivedCount = etherDrv.ReceivedFrames;
+    data.EthSentCount = etherDrv.SentFrames;
+    data.PerfCpuTimeMS = PerfCpuTimeMS;
+    data.PerfCpuTimeMSMAX = PerfCpuTimeMSMAX;
+    data.PerfLoopTimeMS = PerfLoopTimeMS;
+
+    // send packet (type 0x20 - data)
+    etherDrv.SendPacket(0x20, (char*)&data, sizeof(data));
+}
+
+// Process commands received from Ethernet and HopeRF
+void ProcessCommand(int cmd, unsigned char* data, int dataSize)
+{
+    switch( cmd )
+    {
+        case 0x20:
+        {
+            // nesto
+            break;
+        }
     }
 }
 

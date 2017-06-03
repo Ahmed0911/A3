@@ -41,7 +41,7 @@ namespace WinEthApp
 
             navigation = new Navigation(this, mainSystem);
             comboBoxMapSelector.SelectedIndex = comboBoxMapSelector.Items.Count-1; // Load default map         
-            radioButtonHopeRF.Checked = true;
+            //radioButtonHopeRF.Checked = true;
                
             // Fill Default Params
             labelParam1.Text = "GyroOffX";

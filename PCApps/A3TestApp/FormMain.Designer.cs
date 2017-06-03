@@ -284,7 +284,7 @@
             this.textBoxAddressSystem.Name = "textBoxAddressSystem";
             this.textBoxAddressSystem.Size = new System.Drawing.Size(148, 26);
             this.textBoxAddressSystem.TabIndex = 0;
-            this.textBoxAddressSystem.Text = "10.0.1.121";
+            this.textBoxAddressSystem.Text = "192.168.0.121";
             // 
             // label1
             // 

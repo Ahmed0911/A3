@@ -19,10 +19,9 @@
 #include <lwip/inet.h>
 #include "SerialDriver.h"
 #include "HopeRF.h"
-//#include "../CommData.h"
 
 extern uint32_t g_ui32SysClock;
-//extern void ProcessCommand(int cmd, unsigned char* data, int dataSize);
+extern void ProcessCommand(int cmd, unsigned char* data, int dataSize);
 
 void EtherUDPRecv(void *arg, struct udp_pcb *pcb, struct pbuf *p, struct ip_addr *addr, u16_t port)
 {
@@ -58,7 +57,7 @@ void EtherDriver::Init()
 
 
 	// lwIP Ethernet
-	lwIPInit(g_ui32SysClock, pucMACAddress, inet_addr("121.1.0.10"), inet_addr("0.255.255.255"), inet_addr("1.1.0.10"), IPADDR_USE_STATIC); 	// Set IP
+	lwIPInit(g_ui32SysClock, pucMACAddress, inet_addr("121.0.168.192"), inet_addr("0.255.255.255"), inet_addr("1.1.168.192"), IPADDR_USE_STATIC); 	// Set IP
 	//lwIPInit(g_ui32SysClock, pucMACAddress, 0, 0, 0, IPADDR_USE_DHCP); 	// Set IP
 
 	// Fix LEDs
@@ -69,7 +68,7 @@ void EtherDriver::Init()
 	// Setup the device locator service. (can be found by "finder.exe")
 	LocatorInit();
 	LocatorMACAddrSet(pucMACAddress);
-	LocatorAppTitleSet("A2 Board");
+	LocatorAppTitleSet("A3 Board");
 
 	// init lwIP
 	m_udpPcb =  udp_new();
@@ -80,14 +79,6 @@ void EtherDriver::Init()
 
 	ReceivedFrames = 0;
 	SentFrames = 0;
-
-	// RAW Ethernet
-	// Configure the Ethernet controller for normal operation
-	// Enable TX Duplex Mode
-	// Enable TX Padding
-	//EthernetConfigSet(ETH_BASE, (ETH_CFG_TX_DPLXEN | ETH_CFG_TX_PADEN));
-	//EthernetMACAddrSet(ETH_BASE, pucMACAddress); // Set MAC
-	//EthernetEnable(ETH_BASE); // Enable the Ethernet controller
 }
 
 // TODO: ADD EtherDataFIFO for delayed commands->Execute in MAIN!!!
@@ -116,7 +107,7 @@ void EtherDriver::DataReceived(pbuf *p, ip_addr *addr, u16_t port)
 			}
 
 			default:
-				//ProcessCommand(data[2], &data[3], dataSize);
+				ProcessCommand(data[2], &data[3], dataSize);
 				break;
 		}
 	}

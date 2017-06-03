@@ -45,8 +45,8 @@ namespace WinEthApp
             //string filename = string.Format("Log\\LogWifi-{0}-{1}-{2}.bin", DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
             //logStream = File.Create(filename);
             // open RF log file
-            string filenameRF = string.Format("Log\\LogHopeRF-{0}-{1}-{2}.bin", DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
-            logStreamRF = File.Create(filenameRF);
+            //string filenameRF = string.Format("Log\\LogHopeRF-{0}-{1}-{2}.bin", DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second);
+            //logStreamRF = File.Create(filenameRF);
         }
 
         // UDP
@@ -110,7 +110,7 @@ namespace WinEthApp
                                 formMain.FilteredTuningLastData[i] = commData.TuningData[i];
                             }
 
-                            logStream.Write(withoutHeader, 0, withoutHeader.Length);
+                            //logStream.Write(withoutHeader, 0, withoutHeader.Length);
                             break;
 
                         case 0x62: // get params data
