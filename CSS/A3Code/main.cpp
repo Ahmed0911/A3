@@ -40,6 +40,7 @@
 
 uint32_t g_ui32SysClock;
 
+
 // Drivers
 DBGLed dbgLed;
 Timer timerLoop;
@@ -66,7 +67,7 @@ PulsedLightI2C pulseI2C;
 // System Objects
 LLConverter llConv;
 
-// Systick
+// Systick (50Hz, 20ms)
 #define SysTickFrequency 50
 volatile bool SysTickIntHit = false;
 
@@ -78,19 +79,33 @@ BYTE HopeRFbuffer[255];
 // Global Functions
 
 
+////////////////////
 // Global Data
+////////////////////
+// System/Perf Stuff
 int MainLoopCounter;
 float PerfLoopTimeMS;
 float PerfCpuTimeMS;
 float PerfCpuTimeMSMAX;
+
+// IMU
 float Acc[3];
 float Gyro[3];
 float Mag[3];
-float Pressure0 = 101300;
 
-unsigned short PulsedLidarRange = 0;
+// Pressure/Altitude Stuff
+float PressurePa = 0;
+float PressurePa0 = 101300;
+float TemperatureC = 0;
+
+// Rangefinders
+unsigned short SharpDistanceSensorADC = 0;
+unsigned short PulsedLidarRangeCM = 0;
 int PulsedLidarErrors = 0;
-unsigned short SharpDistanceSensor = 0;
+
+// SBUS Inputs
+unsigned int SBUSThrottle = 0;
+unsigned int SBUSSwitchD = 0;
 
 // OFFSETS
 float GyroOffX = 0;
@@ -157,18 +172,24 @@ void main(void)
         // SBUS Data
         int rd = serialU3.Read(CommBuffer, COMMBUFFERSIZE); // read data from SBUS Recv [2500 bytes/second, read at least 3x per second for 1k buffer!!!]
         sbusRecv.NewRXPacket(CommBuffer, rd); // process data
+        SBUSThrottle = sbusRecv.Channels[0];
+        SBUSSwitchD = sbusRecv.Channels[5];
 
-        // ADC + Current Calc
+        // ADC + Sharp Rangefinder
         adcDrv.Update();
-        SharpDistanceSensor = adcDrv.GetValue(ADCBATTCURRENT);
-
-        // Baro
-        baroDrv.Update(); // [??? us]
+        SharpDistanceSensorADC = adcDrv.GetValue(ADCBATTCURRENT);
 
         // PulseLight
         unsigned short newRange = pulseI2C.SoftUpdate();
-        if( newRange != 0 ) PulsedLidarRange = newRange;
+        if( newRange != 0 ) PulsedLidarRangeCM = newRange;
         else PulsedLidarErrors++;
+
+        // Baro/Pressure
+        baroDrv.Update(); // [??? us]
+        PressurePa = baroDrv.PressurePa;
+        TemperatureC = baroDrv.TemperatureC;
+        // Set Pressure0 on 2 sec
+        if(MainLoopCounter == (SysTickFrequency * 2)) PressurePa0 = baroDrv.PressurePa;
 
         // IMU1
         mpu9250Drv.Update();
@@ -188,15 +209,17 @@ void main(void)
         // IMU2
         //lsm90Drv.Update();
 
-        // Set Pressure0 on 2 sec
-        if(MainLoopCounter == (SysTickFrequency * 2)) Pressure0 = baroDrv.PressurePa;
-
         // process ethernet (RX)
         etherDrv.Process(1000/SysTickFrequency); // 2.5ms tick
 
         // Read Lora Data
-        int dataReceived = serialU5.Read(CommBuffer, COMMBUFFERSIZE);
-        comm433MHz.NewRXPacket(CommBuffer, dataReceived); // calls ProcessCommand callback!!!
+        //int dataReceived = serialU5.Read(CommBuffer, COMMBUFFERSIZE);
+        //comm433MHz.NewRXPacket(CommBuffer, dataReceived); // calls ProcessCommand callback!!!
+
+
+        /////////////////////////////////
+        // Processing/Control
+        /////////////////////////////////
 
 
 
@@ -210,6 +233,11 @@ void main(void)
         //dbgLed.Set(ctrl.rtY.GreenLED);
 
 
+
+
+        /////////////////////////////////
+        // System Stuff
+        /////////////////////////////////
         // Get CPU Time
         PerfCpuTimeMS = timerLoop.GetUS()/1000.0f;
         if( PerfCpuTimeMS > PerfCpuTimeMSMAX ) PerfCpuTimeMSMAX = PerfCpuTimeMS;
