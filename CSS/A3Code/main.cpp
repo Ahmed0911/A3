@@ -109,6 +109,9 @@ int PulsedLidarErrors = 0;
 unsigned int SBUSThrottle = 0;
 unsigned int SBUSSwitchD = 0;
 
+// Control Inputs
+unsigned int PWMRef = 0;
+
 // OFFSETS
 float GyroOffX = 0;
 float GyroOffY = 0;
@@ -229,7 +232,7 @@ void main(void)
         /////////////////////////////////
         // OUTPUTS
         /////////////////////////////////
-        //pwmDrv.SetWidthUS(0, ctrl.rtY.PWM1);
+        pwmDrv.SetWidthUS(0, PWMRef);
 
         // DBG LED
         //dbgLed.Set(ctrl.rtY.GreenLED);
@@ -293,7 +296,13 @@ void ProcessCommand(int cmd, unsigned char* data, int dataSize)
     {
         case 0x20:
         {
-            // nesto
+            // Get PWM Ref
+            unsigned int pwmRef;
+            if( dataSize == sizeof(pwmRef))
+            {
+                memcpy(&pwmRef, data, sizeof(pwmRef));
+                PWMRef = pwmRef;
+            }
             break;
         }
     }

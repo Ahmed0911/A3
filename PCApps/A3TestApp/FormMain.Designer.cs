@@ -256,6 +256,8 @@
             this.textBoxWaypointsDownloadCnt = new System.Windows.Forms.TextBox();
             this.label28 = new System.Windows.Forms.Label();
             this.pictureBoxMap = new System.Windows.Forms.PictureBox();
+            this.trackBarPWM = new System.Windows.Forms.TrackBar();
+            this.textBoxPWM = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -275,6 +277,7 @@
             this.groupBox9.SuspendLayout();
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMap)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarPWM)).BeginInit();
             this.SuspendLayout();
             // 
             // textBoxAddressSystem
@@ -1573,6 +1576,8 @@
             // 
             // tabPageMainSystem
             // 
+            this.tabPageMainSystem.Controls.Add(this.textBoxPWM);
+            this.tabPageMainSystem.Controls.Add(this.trackBarPWM);
             this.tabPageMainSystem.Controls.Add(this.textBoxTimeoutCnt);
             this.tabPageMainSystem.Controls.Add(this.label55);
             this.tabPageMainSystem.Controls.Add(this.label47);
@@ -1604,7 +1609,7 @@
             // 
             // textBoxTimeoutCnt
             // 
-            this.textBoxTimeoutCnt.Location = new System.Drawing.Point(1268, 928);
+            this.textBoxTimeoutCnt.Location = new System.Drawing.Point(1304, 959);
             this.textBoxTimeoutCnt.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxTimeoutCnt.Name = "textBoxTimeoutCnt";
             this.textBoxTimeoutCnt.ReadOnly = true;
@@ -1615,7 +1620,7 @@
             // label55
             // 
             this.label55.AutoSize = true;
-            this.label55.Location = new System.Drawing.Point(1152, 930);
+            this.label55.Location = new System.Drawing.Point(1188, 961);
             this.label55.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label55.Name = "label55";
             this.label55.Size = new System.Drawing.Size(95, 20);
@@ -1625,7 +1630,7 @@
             // label47
             // 
             this.label47.AutoSize = true;
-            this.label47.Location = new System.Drawing.Point(1152, 893);
+            this.label47.Location = new System.Drawing.Point(1188, 924);
             this.label47.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label47.Name = "label47";
             this.label47.Size = new System.Drawing.Size(108, 20);
@@ -1634,7 +1639,7 @@
             // 
             // textBoxCommMsgOK
             // 
-            this.textBoxCommMsgOK.Location = new System.Drawing.Point(1268, 890);
+            this.textBoxCommMsgOK.Location = new System.Drawing.Point(1304, 921);
             this.textBoxCommMsgOK.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxCommMsgOK.Name = "textBoxCommMsgOK";
             this.textBoxCommMsgOK.ReadOnly = true;
@@ -1645,7 +1650,7 @@
             // label53
             // 
             this.label53.AutoSize = true;
-            this.label53.Location = new System.Drawing.Point(1152, 859);
+            this.label53.Location = new System.Drawing.Point(1188, 890);
             this.label53.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label53.Name = "label53";
             this.label53.Size = new System.Drawing.Size(113, 20);
@@ -1654,7 +1659,7 @@
             // 
             // textBoxCommHeaderErrors
             // 
-            this.textBoxCommHeaderErrors.Location = new System.Drawing.Point(1268, 856);
+            this.textBoxCommHeaderErrors.Location = new System.Drawing.Point(1304, 887);
             this.textBoxCommHeaderErrors.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxCommHeaderErrors.Name = "textBoxCommHeaderErrors";
             this.textBoxCommHeaderErrors.ReadOnly = true;
@@ -1665,7 +1670,7 @@
             // label54
             // 
             this.label54.AutoSize = true;
-            this.label54.Location = new System.Drawing.Point(1152, 824);
+            this.label54.Location = new System.Drawing.Point(1188, 855);
             this.label54.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label54.Name = "label54";
             this.label54.Size = new System.Drawing.Size(94, 20);
@@ -1674,7 +1679,7 @@
             // 
             // textBoxCommCRCErrors
             // 
-            this.textBoxCommCRCErrors.Location = new System.Drawing.Point(1268, 821);
+            this.textBoxCommCRCErrors.Location = new System.Drawing.Point(1304, 852);
             this.textBoxCommCRCErrors.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.textBoxCommCRCErrors.Name = "textBoxCommCRCErrors";
             this.textBoxCommCRCErrors.ReadOnly = true;
@@ -2656,6 +2661,26 @@
             this.pictureBoxMap.TabStop = false;
             this.pictureBoxMap.Click += new System.EventHandler(this.pictureBoxMap_Click);
             // 
+            // trackBarPWM
+            // 
+            this.trackBarPWM.Location = new System.Drawing.Point(1148, 774);
+            this.trackBarPWM.Maximum = 20;
+            this.trackBarPWM.Name = "trackBarPWM";
+            this.trackBarPWM.Size = new System.Drawing.Size(394, 69);
+            this.trackBarPWM.TabIndex = 64;
+            this.trackBarPWM.Value = 10;
+            this.trackBarPWM.Scroll += new System.EventHandler(this.trackBarPWM_Scroll);
+            // 
+            // textBoxPWM
+            // 
+            this.textBoxPWM.Location = new System.Drawing.Point(1458, 855);
+            this.textBoxPWM.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.textBoxPWM.Name = "textBoxPWM";
+            this.textBoxPWM.ReadOnly = true;
+            this.textBoxPWM.Size = new System.Drawing.Size(84, 26);
+            this.textBoxPWM.TabIndex = 65;
+            this.textBoxPWM.Text = "0";
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(144F, 144F);
@@ -2696,6 +2721,7 @@
             this.groupBox8.ResumeLayout(false);
             this.groupBox8.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxMap)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarPWM)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -2929,6 +2955,8 @@
         private System.Windows.Forms.TextBox textBoxCommCRCErrors;
         private System.Windows.Forms.TextBox textBoxTimeoutCnt;
         private System.Windows.Forms.Label label55;
+        private System.Windows.Forms.TrackBar trackBarPWM;
+        private System.Windows.Forms.TextBox textBoxPWM;
     }
 }
 

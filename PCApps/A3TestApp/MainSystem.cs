@@ -185,6 +185,14 @@ namespace WinEthApp
             SendData(0x90, toSend);
         }
 
+        public void SendPWMValue(int PWMValue)
+        {
+            // Send read request
+            byte[] toSend = Comm.GetBytes(PWMValue);
+
+            formMain.SendData(0x20, toSend);
+        }
+
         ///////////////////////////////
         // Serial Parser + Stuff
         ///////////////////////////////

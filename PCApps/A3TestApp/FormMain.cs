@@ -489,5 +489,13 @@ namespace WinEthApp
             mainSystem.ConnectToSerial((string)comboBoxSerialPorts.SelectedItem);
             buttonSerialOpen.Enabled = false;
         }
+
+        private void trackBarPWM_Scroll(object sender, EventArgs e)
+        {
+            int PWM = (int)(trackBarPWM.Value*100+500);
+            textBoxPWM.Text = PWM.ToString();
+
+            mainSystem.SendPWMValue(PWM);
+        }
     }
 }
