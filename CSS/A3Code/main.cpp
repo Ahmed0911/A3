@@ -286,7 +286,13 @@ void SendPeriodicDataEth(void)
     data.PerfLoopTimeMS = PerfLoopTimeMS;
 
     // send packet (type 0x20 - data)
-    etherDrv.SendPacket(0x20, (char*)&data, sizeof(data));
+    //etherDrv.SendPacket(0x20, (char*)&data, sizeof(data));
+
+    // Matlab test stuff
+    SCommEthMatlabData dataMat;
+    memset(&dataMat,0, sizeof(dataMat) );
+    dataMat.LoopCounter = MainLoopCounter;
+    etherDrv.SendPacket(0x20, (char*)&dataMat, sizeof(dataMat));
 }
 
 // Process commands received from Ethernet and HopeRF

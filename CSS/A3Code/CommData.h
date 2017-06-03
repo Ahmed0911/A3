@@ -91,6 +91,10 @@ struct SCommEthData
     unsigned short LaunchStatus2;
 };
 
+struct SCommEthMatlabData
+{
+    unsigned int LoopCounter;
+};
 
 // Ethernet packets
 // data[0] = 0x42; // magic codes
