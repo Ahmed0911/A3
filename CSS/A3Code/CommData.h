@@ -93,7 +93,24 @@ struct SCommEthData
 
 struct SCommEthMatlabData
 {
+    // Timestamp
     unsigned int LoopCounter;
+
+    // Sensors
+    unsigned short SharpDistanceSensorADC;
+    unsigned short PulsedLidarRangeCM;
+    unsigned short PulsedLidarErrors;
+    unsigned short Dummy;
+
+    // SBUS Inputs
+    unsigned int SBUSThrottle;
+    unsigned int SBUSSwitchD;
+
+    // Ref Inputs
+    unsigned int RefPWMThrottle;
+
+    // Outputs
+    unsigned int OutPWMThrottle;
 };
 
 // Ethernet packets

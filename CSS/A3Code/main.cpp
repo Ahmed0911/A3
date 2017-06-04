@@ -110,7 +110,7 @@ unsigned int SBUSThrottle = 0;
 unsigned int SBUSSwitchD = 0;
 
 // Control Inputs
-unsigned int PWMRef = 0;
+unsigned int PWMRefThrottle = 0;
 
 // OFFSETS
 float GyroOffX = 0;
@@ -232,7 +232,7 @@ void main(void)
         /////////////////////////////////
         // OUTPUTS
         /////////////////////////////////
-        pwmDrv.SetWidthUS(0, PWMRef);
+        pwmDrv.SetWidthUS(0, PWMRefThrottle);
 
         // DBG LED
         //dbgLed.Set(ctrl.rtY.GreenLED);
@@ -292,6 +292,14 @@ void SendPeriodicDataEth(void)
     SCommEthMatlabData dataMat;
     memset(&dataMat,0, sizeof(dataMat) );
     dataMat.LoopCounter = MainLoopCounter;
+    dataMat.SharpDistanceSensorADC = SharpDistanceSensorADC;
+    dataMat.PulsedLidarRangeCM = PulsedLidarRangeCM;
+    dataMat.PulsedLidarErrors = (unsigned short)PulsedLidarErrors; // clip
+    dataMat.SBUSThrottle = SBUSThrottle;
+    dataMat.SBUSSwitchD = SBUSSwitchD;
+    dataMat.RefPWMThrottle = PWMRefThrottle;
+    dataMat.OutPWMThrottle = 456;
+
     etherDrv.SendPacket(0x20, (char*)&dataMat, sizeof(dataMat));
 }
 
@@ -307,7 +315,7 @@ void ProcessCommand(int cmd, unsigned char* data, int dataSize)
             if( dataSize == sizeof(pwmRef))
             {
                 memcpy(&pwmRef, data, sizeof(pwmRef));
-                PWMRef = pwmRef;
+                PWMRefThrottle = pwmRef;
             }
             break;
         }
