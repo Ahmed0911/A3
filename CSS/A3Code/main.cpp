@@ -110,7 +110,15 @@ unsigned int SBUSThrottle = 0;
 unsigned int SBUSSwitchD = 0;
 
 // Control Inputs
-unsigned int PWMRefThrottle = 0;
+unsigned int PWMRefThrottle = 1000;
+
+// Outputs
+unsigned int OutPWMThrottle;
+
+// Control Stuff
+unsigned int ActiveMode;
+// 0 - Manual Override
+// 1 - Matlab/External
 
 // OFFSETS
 float GyroOffX = 0;
@@ -225,6 +233,20 @@ void main(void)
         /////////////////////////////////
         // Processing/Control
         /////////////////////////////////
+        // 1. Check Override Mode
+        if( SBUSSwitchD < 600 )
+        {
+            // manual override mode
+            int PWMScaled = 1000;
+            if( SBUSThrottle < 400) PWMScaled = 1000;
+            else PWMScaled = ((SBUSThrottle - 400) * 1000) / 1500 + 1000;
+            OutPWMThrottle = PWMScaled;
+        }
+        else
+        {
+            // Matlab/External Mode
+            OutPWMThrottle = PWMRefThrottle;
+        }
 
 
 
@@ -298,7 +320,7 @@ void SendPeriodicDataEth(void)
     dataMat.SBUSThrottle = SBUSThrottle;
     dataMat.SBUSSwitchD = SBUSSwitchD;
     dataMat.RefPWMThrottle = PWMRefThrottle;
-    dataMat.OutPWMThrottle = 456;
+    dataMat.OutPWMThrottle = OutPWMThrottle;
 
     etherDrv.SendPacket(0x20, (char*)&dataMat, sizeof(dataMat));
 }
