@@ -110,7 +110,7 @@ unsigned int SBUSThrottle = 0;
 unsigned int SBUSSwitchD = 0;
 
 // Control Inputs
-unsigned int PWMRefThrottle = 900;
+unsigned int PWMRefThrottle = 1000;
 
 // Outputs
 unsigned int OutPWMThrottle;
@@ -237,9 +237,9 @@ void main(void)
         if( SBUSSwitchD < 600 )
         {
             // manual override mode
-            int PWMScaled = 900;
-            if( SBUSThrottle < 400) PWMScaled = 900;
-            else PWMScaled = ((SBUSThrottle - 400) * 1100) / 1500 + 900;
+            int PWMScaled = 1000;
+            if( SBUSThrottle < 400) PWMScaled = 1000;
+            else PWMScaled = ((SBUSThrottle - 400) * 1000) / 1500 + 1000;
             OutPWMThrottle = PWMScaled;
         }
         else
@@ -254,7 +254,7 @@ void main(void)
         /////////////////////////////////
         // OUTPUTS
         /////////////////////////////////
-        pwmDrv.SetWidthUS(0, PWMRefThrottle);
+        pwmDrv.SetWidthUS(0, OutPWMThrottle);
 
         // DBG LED
         //dbgLed.Set(ctrl.rtY.GreenLED);

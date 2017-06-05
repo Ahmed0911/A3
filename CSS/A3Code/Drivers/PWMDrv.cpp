@@ -20,8 +20,9 @@
 #include "driverlib/fpu.h"
 #include "driverlib/pwm.h"
 
-// 22ms PWM period
-#define PWMFREQ (1/0.022f) /* 22ms->45Hz */
+// 20ms PWM period
+//#define PWMFREQ (1/0.022f) /* 22ms->45Hz */
+#define PWMFREQ (1/0.010f) /* 10ms->100Hz */
 //#define PWMFREQ (1/0.004f) /* 4ms->250Hz */
 extern uint32_t g_ui32SysClock;
 
