@@ -157,7 +157,7 @@ void main(void)
     mpu9250Drv.Init();
     //lsm90Drv.Init();
     //InitGPS(); // init GPS
-    etherDrv.Init();
+    //etherDrv.Init();
     //hopeRF.Init();
     imu.Init();
     canDrv.Init();
@@ -223,7 +223,7 @@ void main(void)
         //lsm90Drv.Update();
 
         // process ethernet (RX)
-        etherDrv.Process(1000/SysTickFrequency); // Tick
+        //etherDrv.Process(1000/SysTickFrequency); // Tick
 
         // Read Lora Data
         //int dataReceived = serialU5.Read(CommBuffer, COMMBUFFERSIZE);
@@ -241,11 +241,13 @@ void main(void)
             if( SBUSThrottle < 400) PWMScaled = 1000;
             else PWMScaled = ((SBUSThrottle - 400) * 1000) / 1500 + 1000;
             OutPWMThrottle = PWMScaled;
+            wpnOut.Reset(WPNOUT1);
         }
         else
         {
-            // Matlab/External Mode
-            OutPWMThrottle = PWMRefThrottle;
+            // Kill Engine
+            OutPWMThrottle = 1000;
+            wpnOut.Set(WPNOUT1);
         }
 
 
